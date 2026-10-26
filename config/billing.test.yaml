@@ -1,0 +1,20 @@
+schema_version: 1
+environment: test
+currency: USD
+
+# Tests deliberately use the same rate schedule as production arithmetic.
+models:
+  gpt-6-luna:
+    pricing_version: gpt-6-luna-standard-global-2026-10
+    context_threshold_tokens: 272000
+    prompt_cache_min_tokens: 1024
+    input_usd_per_million: 0.10
+    input_cached_usd_per_million: 0.01
+    input_cache_write_usd_per_million: 0.125
+    output_usd_per_million: 0.50
+    long_context:
+      pricing_version: gpt-6-luna-standard-global-long-2026-10
+      input_usd_per_million: 0.20
+      input_cached_usd_per_million: 0.02
+      input_cache_write_usd_per_million: 0.25
+      output_usd_per_million: 0.75

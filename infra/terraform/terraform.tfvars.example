@@ -1,0 +1,49 @@
+# For a normal deployment, use scripts/cloudshell_build_middleware.sh and
+# scripts/cloudshell_deploy_middleware.sh instead of this manual example.
+# Those scripts derive stack-specific images, resource names, state, and
+# runtime collections. Shared billing collection names come from Terraform
+# configuration (variables.tf defaults or terraform.tfvars).
+project_id      = "YOUR_PROJECT_ID"
+region          = "us-central1"
+gateway_image   = "us-central1-docker.pkg.dev/YOUR_PROJECT_ID/ceosystem/YOUR_STACK-gateway:YOUR_TAG"
+worker_image    = "us-central1-docker.pkg.dev/YOUR_PROJECT_ID/ceosystem/YOUR_STACK-persistence-worker:YOUR_TAG"
+
+gateway_service_name                    = "YOUR_STACK-gateway"
+worker_service_name                     = "YOUR_STACK-persistence-worker"
+gateway_service_account_name            = "YOUR_STACK-gateway-sa"
+worker_service_account_name             = "YOUR_STACK-worker-sa"
+eventarc_service_account_name           = "YOUR_STACK-eventarc-sa"
+billing_reconciler_service_account_name = "YOUR_STACK-reconciler-sa"
+pubsub_topic_name                       = "YOUR_STACK-turn-events"
+allowed_origins                         = ["https://ceoappdev.flutterflow.app"]
+gateway_stream_debug                    = false
+
+# OpenAI API key for saved Agents API agents and post-response usage recovery.
+# Grant the key Agents API read/write and Responses inference permissions.
+# Create the secret if needed, then enter the key at a hidden prompt (do not put
+# it in terraform.tfvars or as a command argument):
+#   gcloud secrets create openai-api-key --replication-policy=automatic
+#   read -s -p "OpenAI API key: " OPENAI_API_KEY
+#   printf '%s' "$OPENAI_API_KEY" | gcloud secrets versions add openai-api-key --data-file=-
+#   unset OPENAI_API_KEY
+openai_api_key_secret_id      = "openai-api-key"
+openai_api_key_secret_version = "1"
+
+# Prepaid wallet enforcement and reservation reconciliation.
+# Set billing_enforcement_enabled to true to require credit before every turn.
+# Provider-usage lookup has its own exponential-backoff lifecycle, independent
+# of normal settlement or expiry of the wallet reservation, and runs for up to
+# seven days.
+# Unresolved usage requires manual billing review but does not block new turns
+# when the available wallet balance covers their reservations; known late usage
+# is collected when wallet funds are available.
+billing_enforcement_enabled    = false
+billing_reconciliation_enabled = false
+billing_reconciliation_schedule = "*/5 * * * *"
+billing_usage_reconciliation_initial_backoff_seconds = 300
+billing_usage_reconciliation_max_backoff_seconds = 21600
+billing_usage_reconciliation_retention_seconds = 604800
+deployment_environment         = "development"
+
+# Optional: add Cloud Monitoring notification channel resource names for launch alerts.
+alert_notification_channels = []

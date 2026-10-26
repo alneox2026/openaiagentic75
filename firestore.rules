@@ -1,0 +1,26 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Cloud Shell deploys assign each middleware a suffix such as
+    // "_agentic4". Server SDKs use IAM and bypass these rules; these rules
+    // protect direct mobile/web client access across every such stack.
+    function isOwnerReadableCollection(collection) {
+      return collection.matches('customer_billing_accounts_[a-z0-9_]+') ||
+             collection.matches('customer_wallets_[a-z0-9_]+') ||
+             collection.matches('wallet_transactions_[a-z0-9_]+') ||
+             collection.matches('customer_billing_periods_[a-z0-9_]+');
+    }
+
+    match /{collection}/{documentId} {
+      // Billing account, wallet, transaction, and period documents are
+      // read-only for their authenticated owner. All writes remain backend
+      // only, and every other collection—including webhook receipts,
+      // cancellation requests, reservations, and ledgers—is denied by default.
+      allow read: if request.auth != null &&
+                    isOwnerReadableCollection(collection) &&
+                    resource.data.owner_uid == request.auth.uid;
+      allow write: if false;
+    }
+  }
+}

@@ -1,0 +1,11 @@
+agents:
+  openai_managed_agent:
+    # Verify the saved Agent ID and model before the first production deploy.
+    agent_id: openai_managed_agent
+    backend: openai_managed
+    remote_agent_id: agent_bc86941978354b21a682cde68398daca57998fc854d74ce3a1
+    model: gpt-6-luna
+    region: global
+    reservation_nanos: 400000000
+    streaming_enabled: true
+    persistence_enabled: true
